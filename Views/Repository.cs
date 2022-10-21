@@ -43,11 +43,12 @@ namespace JournalOfEmployeeWorkbooks.Views
             List<string> stringDataOfEmployee = new List<string>();
 
             string line = "";
-
+            //Чтение данных из файла
             using (StreamReader streamReader = new StreamReader(path))
             {
                 while ((line = streamReader.ReadLine()) != null)
                 {
+                    //Добавление в список
                     stringDataOfEmployee.Add(line);
                 }
             }
@@ -68,6 +69,7 @@ namespace JournalOfEmployeeWorkbooks.Views
             
             for (int i = 0; i < stringData.Count; i++)
             {
+                //Разделенные строковые данные
                 string[] separatedData = stringData[i].Split('#');
 
                 Employee employee = new Employee();
@@ -81,7 +83,7 @@ namespace JournalOfEmployeeWorkbooks.Views
                 employee.Age = separatedData[6];
                 employee.PlaceOfBirth = separatedData[7];
                 employee.PostOfEmployee = separatedData[8];
-
+                //Добавлеие в основной список
                 DataOfEmployees.Add(employee);
             }
             return DataOfEmployees;
@@ -121,9 +123,6 @@ namespace JournalOfEmployeeWorkbooks.Views
         /// <param name="postOfEmployee">Должность, занимаемая сотрудником</param>
         public void CreateRecord(string path, Employee employee)
         {
-            //var employee = new Employee(secondName, firstName, thirdName,
-            //    age, dateOfBirth, placeOfBirth, postOfEmployee);
-
             DataOfEmployees = ViewAllRecords(path);
 
             DataOfEmployees.Add(employee);
@@ -140,16 +139,18 @@ namespace JournalOfEmployeeWorkbooks.Views
         {
             try
             {
+                //Добавление всех сотрудников из файла в список
                 DataOfEmployees = ViewAllRecords(path);
-
+                //Поиск сотрудника по его ID
                 var deleteEmployee = GetEmployeeByID(ID);
-
+                //Удаление сотрудника из списка
                 DataOfEmployees.Remove(deleteEmployee);
-
+                //Запись данных в файл после удаления
                 WriteInformationToFile(path);
             }
             catch
             {
+                //В случае ошибки проинформировать об этом
                 ErrorMessage = "Can't find an employee with this ID!";
                 throw new ApplicationException(ErrorMessage);
             }
@@ -157,11 +158,12 @@ namespace JournalOfEmployeeWorkbooks.Views
         }
 
         /// <summary>
-        /// Записать информацию о сотруднике в файл
+        /// Записать информацию о сотрудниках в файл
         /// </summary>
         /// <param name="path">Путь к файлу</param>
         private void WriteInformationToFile(string path)
         {
+            //Запись в файл данных о сотрудниках
             using (StreamWriter streamWriter = new StreamWriter(path, false))
             {
                 for (int i = 0; i < DataOfEmployees.Count; i++)
@@ -268,19 +270,6 @@ namespace JournalOfEmployeeWorkbooks.Views
         }
         #endregion
 
-        #region Редактирование возраста сотрудника
-        //public void RedactAgeInRecord(int ID, string path, string age)
-        //{
-        //    DataOfEmployees = ViewAllRecords(path);
-
-        //    var employee = GetEmployeeByID(ID);
-
-        //    employee.Age = age;
-
-        //    WriteInformationToFile(path);
-        //}
-        #endregion
-
         #region Редактирование места рождения сотрудника
         public void RedactPlaceOfBirthInRecord(int ID, string path, string placeOfBirth)
         {
@@ -326,12 +315,15 @@ namespace JournalOfEmployeeWorkbooks.Views
         {
             try
             {
+                //Добавление всех сотрудников из файла в список
                 DataOfEmployees = ViewAllRecords(path);
 
+                //Выбор тех записей, которые удовлетворяют тому, что дата регистрации больше
+                //начальной даты и меньше конечной даты, вводимой пользователем
                 var dataOfEmployeeInDateRange = DataOfEmployees.
                     Where(x => x.DateTimeAddingRegistration >= startingDate &&
                                x.DateTimeAddingRegistration <= endDate).ToList();
-
+                //Если список записей не удовлетворяет заданным датам, то возврат пустого списка
                 if(dataOfEmployeeInDateRange == null)
                 {
                     return null;

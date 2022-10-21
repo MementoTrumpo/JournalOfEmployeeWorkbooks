@@ -78,54 +78,16 @@ namespace JournalOfEmployeeWorkbooks
         private const string PATH = @"D:\source\Проекты SkillBox\JournalOfEmployeeWorkbooks\InformationAboutEmployees.txt";
 
         static void Main(string[] args)
-        {           
+        {         
+            //Точка входа в приложение
             Program entryMainPoint = new Program();
-
+            //Запуск приложения
             entryMainPoint.RunApplication();
 
-            
             Console.WriteLine();
 
             Console.ReadKey();
         }
-
-
-
-        private void CreateFunctionalMenu()
-        {
-            string indicator = "=>";
-            int countSpaces = 5;
-            string chooseOperation = operations[0];
-            //Console.WriteLine($"{indicator}   {operations[0]}");
-
-            do
-            {
-                for (int i = 0; i < operations.Count; i++)
-                {
-                    if (i == 0)
-                    {
-                        Console.WriteLine($"{indicator}   {operations[i]}");
-                    }
-
-                    string operation = operations[i];
-                    for (int j = 0; j < countSpaces; j++)
-                    {
-                        operation = operation.Insert(0, " ");
-                    }
-                    Console.WriteLine(operation);
-                }
-
-                ConsoleKeyInfo consoleKeyInfo = Console.ReadKey(true);
-
-                if (consoleKeyInfo.Key == ConsoleKey.Escape)
-                {
-                    break;
-                }
-            }
-            while (true);
-
-        }
-
  
         /// <summary>
         /// Операции выбора в пользовательском меню
@@ -145,64 +107,65 @@ namespace JournalOfEmployeeWorkbooks
             "\tEscape - Close programm\n"
         };
 
+        //Будущее меню с более красивым выбором нужного действия
         /// <summary>
         /// Создание интерфейса для взаимодействия с пользователем
         /// </summary>
-        public void MakeUserMenu()
-        {
-            ConsoleKey key;
-            int position = 0;
-            string separatingLine = ReturnSeparatingLine();
+        //public void MakeUserMenu()
+        //{
+        //    ConsoleKey key;
+        //    int position = 0;
+        //    string separatingLine = ReturnSeparatingLine();
 
-            while ((key = Console.ReadKey(true).Key) != ConsoleKey.Escape)
-            {
+        //    while ((key = Console.ReadKey(true).Key) != ConsoleKey.Escape)
+        //    {
                 
-                switch (key)
-                {
-                    case ConsoleKey.UpArrow:
-                        position--;
+        //        switch (key)
+        //        {
+        //            case ConsoleKey.UpArrow:
+        //                position--;
 
-                        if (position < 0)
-                        {
-                            position = 0;
-                        }
-                        operations[position] = operations[position].Insert(0, "");
-                        operations[position] = operations[position].Insert(0, "=>");
+        //                if (position < 0)
+        //                {
+        //                    position = 0;
+        //                }
+        //                operations[position] = operations[position].Insert(0, "");
+        //                operations[position] = operations[position].Insert(0, "=>");
 
-                        Console.WriteLine(separatingLine);
-                        for (int i = 0; i < operations.Count; i++)
-                        {
+        //                Console.WriteLine(separatingLine);
+        //                for (int i = 0; i < operations.Count; i++)
+        //                {
 
-                            Console.Write(operations[i]);
-                            Console.WriteLine(separatingLine);
-                        }
-                        operations[position] = operations[position].Insert(0, "");
+        //                    Console.Write(operations[i]);
+        //                    Console.WriteLine(separatingLine);
+        //                }
+        //                operations[position] = operations[position].Insert(0, "");
 
-                        break;
+        //                break;
 
-                    case ConsoleKey.DownArrow:
-                        position++;
+        //            case ConsoleKey.DownArrow:
+        //                position++;
 
-                        if (position > operations.Count - 1)
-                        {
-                            position = operations.Count - 1;
-                        }
-                        operations[position] = operations[position].Insert(0, "");
-                        operations[position] = operations[position].Insert(0, "=>");
+        //                if (position > operations.Count - 1)
+        //                {
+        //                    position = operations.Count - 1;
+        //                }
+        //                operations[position] = operations[position].Insert(0, "");
+        //                operations[position] = operations[position].Insert(0, "=>");
 
-                        Console.WriteLine(separatingLine);
-                        for (int i = 0; i < operations.Count; i++)
-                        {
-                            Console.Write(operations[i]);
-                            Console.WriteLine(separatingLine);
-                        }
-                        operations[position] = operations[position].Insert(0, "");
+        //                Console.WriteLine(separatingLine);
+        //                for (int i = 0; i < operations.Count; i++)
+        //                {
+        //                    Console.Write(operations[i]);
+        //                    Console.WriteLine(separatingLine);
+        //                }
+        //                operations[position] = operations[position].Insert(0, "");
 
-                        break;
-                }
-            }
+        //                break;
+        //        }
+        //    }
 
-        }
+        //}
 
         /// <summary>
         /// Создает меню для информирования пользователя о возможных действиях
@@ -242,8 +205,8 @@ namespace JournalOfEmployeeWorkbooks
 
                         do
                         {
+                            //Очистка консоли и информирование пользователя о совершаемом им действии
                             Console.Clear();
-
                             var phraseCreatingOfEmployee = "\tCreating record in database";
                             Console.WriteLine(phraseCreatingOfEmployee);
                             Console.WriteLine(GetSeparatingLine(phraseCreatingOfEmployee) + "\n");
@@ -252,23 +215,39 @@ namespace JournalOfEmployeeWorkbooks
                             repository = new Repository(ListOfEmployee);
                             Employee employee = new Employee();
 
+                            //Ввод фамилии сотрудника
                             mainView.InputSecondName(employee, secondNameSuggestion);
                             Console.WriteLine();
+
+                            //Ввод имени сотрудника
                             mainView.InputFirstName(employee, firstNameSugestion);
                             Console.WriteLine();
+
+                            //Ввод отчества сотрудника
                             mainView.InputThirdName(employee, thirdNameSuggestion);
                             Console.WriteLine();
+
+                            //Ввод даты рождения сотрудника
                             mainView.InputDateOfBirth(employee, dateOfBirthSuggestion);
                             Console.WriteLine();
+
+                            //Ввод мета рождения сотрудника
                             mainView.InputPlaceOfBirth(employee, placeOfBirthSuggestion);
                             Console.WriteLine();
+
+                            //Ввод должности сотрудника
                             mainView.InputPostOfEmployee(employee, postOfEmployeeSuggestion);
                             Console.WriteLine();
+
+                            //Вывод ID сотрудника
                             Console.WriteLine($"\tID - {employee.ID}");
                             Console.WriteLine();
+
+                            //Вывод даты добавления регистрации записи сотрудника
                             Console.WriteLine($"\tDate of adding record - {employee.DateTimeAddingRegistration.ToShortDateString()}");
                             Console.WriteLine();
 
+                            //Сообщение пользователю о корректности ввода
                             PrintingSuggestionsAboutCorrectnessOfInput();
 
                             ConsoleKey keyToTruth;
@@ -277,6 +256,7 @@ namespace JournalOfEmployeeWorkbooks
                             
                             if ((keyToTruth == ConsoleKey.D1) || (keyToTruth == ConsoleKey.NumPad1))
                             {
+                                //Создание записи в базе данных
                                 repository.CreateRecord(path: PATH, employee);
                                 dataIsCorrectly = true;
                             }
@@ -286,6 +266,7 @@ namespace JournalOfEmployeeWorkbooks
                             }
                         } while (dataIsCorrectly != true);
 
+                        //Возврат в главное меню
                         ReturnToMainMenu();
                                                 
                         break;
@@ -295,6 +276,7 @@ namespace JournalOfEmployeeWorkbooks
                         dataIsCorrectly = false;
                         do
                         {
+                            //Очистка консоли и информирование пользователя о совершаемом им действии
                             Console.Clear();
                             var phraseDeletingOfEmployee = "\tDeleting an employee from the database";
                             Console.WriteLine(phraseDeletingOfEmployee);
@@ -303,16 +285,18 @@ namespace JournalOfEmployeeWorkbooks
                             mainView = new MainView();
                             repository = new Repository(ListOfEmployee);
 
+                            //Ввод ID сотрудника
                             mainView.InputID(idSuggestion);
                             Console.WriteLine();
 
+                            //Сообщение пользователю о корректности ввода
                             PrintingSuggestionsAboutCorrectnessOfInput();
                             
-
                             ConsoleKey keyToTruth = Console.ReadKey(true).Key;
 
                             if(keyToTruth == ConsoleKey.D1 || keyToTruth == ConsoleKey.NumPad1)
                             {
+                                //Удаление сотрудника из базы данных
                                 var output = mainView.DeleteEmployee(repository,int.Parse(mainView.ID),
                                     phraseDeletingOfEmployee, PATH);
                                 if(output == 1)
@@ -338,9 +322,8 @@ namespace JournalOfEmployeeWorkbooks
 
 
                     case (ConsoleKey.D3 or ConsoleKey.NumPad3):
-
+                        //Очистка консоли и информирование пользователя о совершаемом им действии
                         Console.Clear();
-
                         var phraseViewingAllRecords = "\t Viewing all records in database";
                         Console.WriteLine(phraseViewingAllRecords);
                         Console.WriteLine(GetSeparatingLine(phraseViewingAllRecords) + "\n");
@@ -355,6 +338,7 @@ namespace JournalOfEmployeeWorkbooks
                             Console.WriteLine(employee.ToString());
                         }
 
+                        //Возврат в главное меню
                         ReturnToMainMenu();
                         break;
 
@@ -366,13 +350,17 @@ namespace JournalOfEmployeeWorkbooks
 
                         do
                         {
+                            //Очистка консоли и информирование пользователя о совершаемом им действии
                             Console.Clear();
                             var phraseOfViewingEmployee = "\tViewing one employee\n";
                             Console.Write(phraseOfViewingEmployee);
                             Console.WriteLine(GetSeparatingLine(phraseOfViewingEmployee) + "\n");
 
+                            //Ввод ID сотрудника
                             mainView.InputID(idSuggestion);
                             Console.WriteLine();
+
+                            //Опрос пользователя о корректности ввода
                             PrintingSuggestionsAboutCorrectnessOfInput();
 
                             separateLine = "\t---------------------------------------------";
@@ -439,8 +427,10 @@ namespace JournalOfEmployeeWorkbooks
 
                                 do
                                 {
+                                    //Текущая позиция курсора в консоли
                                     currentPosition = Console.GetCursorPosition();
                                     Console.WriteLine("\tPlease, repeat the input");
+                                    //Ввод значения для продолжения ввода
                                     keyToContinue = Console.ReadKey(false).Key;
                                     ClearIncorrectInput(currentPosition);
 
@@ -707,11 +697,6 @@ namespace JournalOfEmployeeWorkbooks
                         //Возврат в главное меню
                         ReturnToMainMenu();
                         break;
-                    case (ConsoleKey.Escape):
-                        Console.Clear();
-                        Console.WriteLine("The user selected escape from the programm");
-                        break;
-
                 }
             } while (key != ConsoleKey.Escape);
 
@@ -740,6 +725,11 @@ namespace JournalOfEmployeeWorkbooks
             }
         }
         
+        /// <summary>
+        /// Возващает строку разделителей (нижнего подчеркивания) с учетом длины строки
+        /// </summary>
+        /// <param name="line">Строка, которую необходимо отделить от остального текста</param>
+        /// <returns>Возвращает строку разделителей</returns>
         private static string GetSeparatingLine(string line)
         {
             string separatingString = "\t";
@@ -762,7 +752,9 @@ namespace JournalOfEmployeeWorkbooks
         {
             //Очищает неправильно введенный пользователем текст, а также сообщение об ошибке
             Console.SetCursorPosition(currentPosition.Item1, currentPosition.Item2);
+            //Печать строки, состоящей из 15 пустых строк после начального положения курсора
             Console.Write(new String(' ', Console.BufferWidth * 15));
+            //Вновь установка нового положения курсора
             Console.SetCursorPosition(currentPosition.Item1, currentPosition.Item2);
         }
 
@@ -775,12 +767,13 @@ namespace JournalOfEmployeeWorkbooks
 
             do
             {
+                //Установка текущего положения курсора
                 currentPosition = Console.GetCursorPosition();
 
                 Console.WriteLine("\tPress enter to exit the main menu...");
-
+                //Ввод клавиши enter для выхода из приложения
                 exitKey = Console.ReadKey(true).Key;
-
+                //Очистка некорректного ввода
                 ClearIncorrectInput(currentPosition);
 
             } while (exitKey != ConsoleKey.Enter);
@@ -809,7 +802,7 @@ namespace JournalOfEmployeeWorkbooks
         /// </summary>
         /// <param name="operations">Список команд, использующихся в меню</param>
         /// <returns>Количество символов</returns>
-        internal int FindingMaximumNumberOfCharacters(List<string> operations)
+        private int FindingMaximumNumberOfCharacters(List<string> operations)
         {
             int maxCharacters = 0;
 

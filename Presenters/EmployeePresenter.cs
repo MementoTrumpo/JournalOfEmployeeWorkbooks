@@ -9,7 +9,7 @@ using JournalOfEmployeeWorkbooks.Views;
 
 namespace JournalOfEmployeeWorkbooks.Presenters
 {
-    public class EmployeePresenter : IErrorInformation
+    public class EmployeePresenter
     {
         private Employee employee;
 
@@ -39,19 +39,7 @@ namespace JournalOfEmployeeWorkbooks.Presenters
         
         public void InputFirstName()
         {
-            
-
-            //while (!TryInputFirstName(string))
-            //{
-                
-            //}
-                
-            
-
-
-
-
-
+             
         }
         /// <summary>
         /// Делает запись в журнале

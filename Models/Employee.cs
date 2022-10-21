@@ -10,6 +10,9 @@ namespace JournalOfEmployeeWorkbooks
 {
     public class Employee
     {
+        /// <summary>
+        /// Информация об ошибке
+        /// </summary>
         public string ErrorMessage { get; set; }
 
         /// <summary>
@@ -317,26 +320,22 @@ namespace JournalOfEmployeeWorkbooks
                    $"\tPost of employee - {PostOfEmployee}\n";
         }
 
-        public string GetErrorMessage()
-        {
-            return ErrorMessage;
-        }
-
         /// <summary>
         /// Проверка строки на наличие цифр и других знаков (кроме пробела и тире)
         /// </summary>
         /// <param name="str">Исходная строка для проверка</param>
         /// <returns>true - если в строке нет цифр, false - если строка содержит цифры</returns>
-            private bool CheckStringForNumbers(string str)
+        private bool CheckStringForNumbers(string str)
         {
+           
             string[] _str = str.Split(new char[] { ' ', '-', '/', '|', ',',
                 ';', ':', '<', '>'},StringSplitOptions.RemoveEmptyEntries);
-
+            
             if (_str.Length == 0)
             {
                 return false;
             }
-
+            
             foreach (var s in _str)
             {
                 foreach(var ch in s)

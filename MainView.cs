@@ -573,11 +573,11 @@ namespace JournalOfEmployeeWorkbooks
                                              string firstNameSuggestion)
         {
             string errorMessage = string.Empty;
-
+            //1 - если все верно, 0 - если возникла ошибка
             int correctOutput = 0;
 
             if (TryRedactFirstNameOfEmployee(repository, ID, firstNameSuggestion, path,
-                out errorMessage, out Employee employee) == true)
+                out errorMessage) == true)
             {
                 correctOutput = 1;
                 return correctOutput;
@@ -588,29 +588,39 @@ namespace JournalOfEmployeeWorkbooks
             }
         }
 
-
+        /// <summary>
+        /// Попытка изменения имени сотрудника
+        /// </summary>
+        /// <param name="repository">Репозиторий с информацией о сотрудниках</param>
+        /// <param name="ID">ID сотрудника</param>
+        /// <param name="firstNameSuggestion">Имя сотрудника</param>
+        /// <param name="path">Путь к файлу</param>
+        /// <param name="errorMessage">Сообщение об ошибке</param>
+        /// <returns>Возвращает true - если удалось изменить имя сотрудника, false - если не удалось</returns>
         private bool TryRedactFirstNameOfEmployee(Repository repository, int ID,
-            string firstNameSuggestion, string path, out string errorMessage, out Employee employee)
+            string firstNameSuggestion, string path, out string errorMessage)
         {
             errorMessage = string.Empty;
-
+            //Установка текущего положения курсора
             currentPosition = Console.GetCursorPosition();
 
             try
             {
-                employee = new Employee();
-
+                var employee = new Employee();
+                //Ввод нового имени сотрудника
                 InputFirstName(employee, firstNameSuggestion);
-
+                //Редактирование имени сотрудника в базе данных
                 repository.RedactFirstNameInRecord(ID, path, employee.FirstName);
 
                 return true;
             }
             catch (Exception ex)
             {
-                employee = null;
+                //Установка сообщения об ошибке в переменную
                 errorMessage = ex.Message;
+                //Печать ошибки в консоль
                 PrintErrorMessage(errorMessage);
+                //Ввод enter для продолжения работы программы
                 Console.ReadLine();
                 return false;
             }
@@ -623,11 +633,11 @@ namespace JournalOfEmployeeWorkbooks
                                      string secondNameSuggestion)
         {
             string errorMessage = string.Empty;
-
+            //1 - если все завершилось корректно, 0 - если возникла ошибка
             int correctOutput = 0;
 
             if (TryRedactSecondNameOfEmployee(repository, ID, secondNameSuggestion, path,
-                out errorMessage, out Employee employee) == true)
+                out errorMessage) == true)
             {
                 correctOutput = 1;
                 return correctOutput;
@@ -638,29 +648,39 @@ namespace JournalOfEmployeeWorkbooks
             }
         }
 
-
+        /// <summary>
+        /// Попытка изменения фамилии сотрудника
+        /// </summary>
+        /// <param name="repository">Репозиторий с информацией о сотрудниках</param>
+        /// <param name="ID">ID сотрудника</param>
+        /// <param name="thirdNameSuggestion">Отчество сотрудника</param>
+        /// <param name="path">Путь к файлу</param>
+        /// <param name="errorMessage">Сообщение об ошибке</param>
+        /// <returns>Возвращает true - если удалось изменить фамилию сотрудника, false - если не удалось</returns>
         private bool TryRedactSecondNameOfEmployee(Repository repository, int ID,
-            string secondNameSuggestion, string path, out string errorMessage, out Employee employee)
+            string secondNameSuggestion, string path, out string errorMessage)
         {
             errorMessage = string.Empty;
-
+            //Установка текущего положения курсора
             currentPosition = Console.GetCursorPosition();
 
             try
             {
-                employee = new Employee();
-
+                var employee = new Employee();
+                //Ввод новой фамилии сотрудника
                 InputSecondName(employee, secondNameSuggestion);
-
+                //Редактирование фамилии сотрудника
                 repository.RedactSecondNameInRecord(ID, path, employee.SecondName);
 
                 return true;
             }
             catch (Exception ex)
             {
-                employee = null;
+                //Установка сообщения об ошибке в переменную
                 errorMessage = ex.Message;
+                //Печать ошибки в консоль
                 PrintErrorMessage(errorMessage);
+                //Ввод enter для продолжения работы
                 Console.ReadLine();
                 return false;
             }
@@ -668,15 +688,16 @@ namespace JournalOfEmployeeWorkbooks
         #endregion
 
         #region Изменение отчества сотрудника и запись в базу данных обновленное отчество сотрудника
+        //Редактирование отчества сотрудника
         public int RedactThirdNameOfEmployee(Repository repository, int ID, string path,
                              string thirdNameSuggestion)
         {
             string errorMessage = string.Empty;
-
+            //Переменная, инфрмирующая о корректности изменения отчества сотрудника
             int correctOutput = 0;
-
+            //1 - если все завершилось корректно, 0 - если возникла ошибка
             if (TryRedactThirdNameOfEmployee(repository, ID, thirdNameSuggestion, path,
-                out errorMessage, out Employee employee) == true)
+                out errorMessage) == true)
             {
                 correctOutput = 1;
                 return correctOutput;
@@ -687,29 +708,39 @@ namespace JournalOfEmployeeWorkbooks
             }
         }
 
-
+        /// <summary>
+        /// Попытка изменить отчество сотрудника
+        /// </summary>
+        /// <param name="repository">Репозиторий с информацией о сотрудниках</param>
+        /// <param name="ID">ID сотрудника</param>
+        /// <param name="thirdNameSuggestion">Отчество сотрудника</param>
+        /// <param name="path">Путь к файлу</param>
+        /// <param name="errorMessage">Сообщение об ошибке</param>
+        /// <returns>Возвращает true - если удалось изменить отчество сотрудника, false - если не удалось</returns>
         private bool TryRedactThirdNameOfEmployee(Repository repository, int ID,
-            string thirdNameSuggestion, string path, out string errorMessage, out Employee employee)
+            string thirdNameSuggestion, string path, out string errorMessage)
         {
             errorMessage = string.Empty;
-
+            //Установка текущего положения курсора
             currentPosition = Console.GetCursorPosition();
 
             try
             {
-                employee = new Employee();
-
+                var employee = new Employee();
+                //Ввод нового отчеста сотрудника
                 InputThirdName(employee, thirdNameSuggestion);
-
+                //Изменение отчества сотрудника в файле
                 repository.RedactThirdNameInRecord(ID, path, employee.ThirdName);
 
                 return true;
             }
             catch (Exception ex)
             {
-                employee = null;
+                //Установка сообщения об ошибке в переменную
                 errorMessage = ex.Message;
+                //Печать ошибки в консоль
                 PrintErrorMessage(errorMessage);
+                //Ввод enter для продолжения работы
                 Console.ReadLine();
                 return false;
             }
@@ -725,7 +756,7 @@ namespace JournalOfEmployeeWorkbooks
             int correctOutput = 0;
 
             if (TryRedactDateOfBirthOfEmployee(repository, ID, dateOfBirthSuggestion, path,
-                out errorMessage, out Employee employee) == true)
+                out errorMessage) == true)
             {
                 correctOutput = 1;
                 return correctOutput;
@@ -736,9 +767,18 @@ namespace JournalOfEmployeeWorkbooks
             }
         }
 
-
+        /// <summary>
+        /// Попытка изменить даут рождения сотрудника
+        /// </summary>
+        /// <param name="repository">Репозиторий с информацией о сотрудниках</param>
+        /// <param name="ID">ID сотрудника</param>
+        /// <param name= "dateOfBirthSuggestion">Дата рождения сотрудника</param>
+        /// <param name="path">Путь к файлу</param>
+        /// <param name="errorMessage">Сообщение об ошибке</param>
+        /// <returns>Возвращает true - если удалось изменить дату рождения сотрудника,
+        /// false - если не удалось</returns>
         private bool TryRedactDateOfBirthOfEmployee(Repository repository, int ID,
-            string dateOfBirthSuggestion, string path, out string errorMessage, out Employee employee)
+            string dateOfBirthSuggestion, string path, out string errorMessage)
         {
             errorMessage = string.Empty;
 
@@ -746,18 +786,20 @@ namespace JournalOfEmployeeWorkbooks
 
             try
             {
-                employee = new Employee();
-
+                var employee = new Employee();
+                //Ввод новой даты сотрудника
                 InputDateOfBirth(employee, dateOfBirthSuggestion);
-
+                //Редактирование даты рождения сотрудника в базе данных + автоматическое изменение 
+                //возраста сотрудника из-за свойства возраста Employee
                 repository.RedactDateOfBirthInRecord(ID, path, employee.DateOfBirth);
 
                 return true;
             }
             catch (Exception ex)
             {
-                employee = null;
+                //Присваивание переменной название ошибки
                 errorMessage = ex.Message;
+                //Вывод ошибки в консоль
                 PrintErrorMessage(errorMessage);
                 Console.ReadLine();
                 return false;
@@ -770,11 +812,11 @@ namespace JournalOfEmployeeWorkbooks
                      string placeOfBirthSuggestion)
         {
             string errorMessage = string.Empty;
-
+            //Переменная, инфрмирующая о корректности изменения отчества сотрудника
             int correctOutput = 0;
-
+            //1 - если все завершилось корректно, 0 - если возникла ошибка
             if (TryRedactPlaceOfBirthOfEmployee(repository, ID, placeOfBirthSuggestion, path,
-                out errorMessage, out Employee employee) == true)
+                out errorMessage) == true)
             {
                 correctOutput = 1;
                 return correctOutput;
@@ -785,28 +827,38 @@ namespace JournalOfEmployeeWorkbooks
             }
         }
 
-
+        /// <summary>
+        /// Попытка изменить место рождения сотрудника
+        /// </summary>
+        /// <param name="repository">Репозиторий с информацией о сотрудниках</param>
+        /// <param name="ID">ID сотрудника</param>
+        /// <param name="placeOfBirthSuggestion">Дата рождения сотрудника</param>
+        /// <param name="path">Путь к файлу</param>
+        /// <param name="errorMessage">Сообщение об ошибке</param>
+        /// <returns>Возвращает true - если удалось изменить место рождения сотрудника,
+        /// false - если не удалось</returns>
         private bool TryRedactPlaceOfBirthOfEmployee(Repository repository, int ID,
-            string placeOfBirthSuggestion, string path, out string errorMessage, out Employee employee)
+            string placeOfBirthSuggestion, string path, out string errorMessage)
         {
             errorMessage = string.Empty;
-
+            //Установка текущего положения курсораы
             currentPosition = Console.GetCursorPosition();
 
             try
             {
-                employee = new Employee();
-
+                var employee = new Employee();
+                //Ввод нового места рождения сотрудника
                 InputPlaceOfBirth(employee, placeOfBirthSuggestion);
-
+                //Изменение места рождения в базе данных
                 repository.RedactPlaceOfBirthInRecord(ID, path, employee.PlaceOfBirth);
 
                 return true;
             }
             catch (Exception ex)
             {
-                employee = null;
+                //Присваивание переменной информации об ошибке
                 errorMessage = ex.Message;
+                //Вывод пользователю о том, что произошла ошибка
                 PrintErrorMessage(errorMessage);
                 Console.ReadLine();
                 return false;
@@ -833,7 +885,10 @@ namespace JournalOfEmployeeWorkbooks
         {
             //Очищает неправильно введенный пользователем текст, а также сообщение об ошибке
             Console.SetCursorPosition(currentPosition.Item1, currentPosition.Item2);
+            //Заполняет 15 строк после текущей позиции курсора пустыми строчками,
+            // чтобы удалить информаицю об ошибках и продолжении работы программы
             Console.Write(new String(' ', Console.BufferWidth * 15));
+            //Установка текущего значения положения курсора в новое положение
             Console.SetCursorPosition(currentPosition.Item1, currentPosition.Item2);
         }
     }
