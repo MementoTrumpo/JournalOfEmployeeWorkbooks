@@ -97,6 +97,9 @@ namespace JournalOfEmployeeWorkbooks.Views
         /// <exception cref="ApplicationException">Если сотрудник не найден</exception>
         public Employee ViewingOneRecord(int ID, string path)
         {
+            //Проверка на пустоту базы данных
+            ChekingTheEmptinessOfTheDataBase(path);
+
             try
             {
                 DataOfEmployees = ViewAllRecords(path);
@@ -137,10 +140,12 @@ namespace JournalOfEmployeeWorkbooks.Views
         /// <param name="path">Путь к файлу</param>
         public void DeleteRecord(int ID, string path)
         {
+            //Проверка на пустоту базы данных
+            ChekingTheEmptinessOfTheDataBase(path);
+
             try
             {
-                //Добавление всех сотрудников из файла в список
-                DataOfEmployees = ViewAllRecords(path);
+
                 //Поиск сотрудника по его ID
                 var deleteEmployee = GetEmployeeByID(ID);
                 //Удаление сотрудника из списка
@@ -185,14 +190,18 @@ namespace JournalOfEmployeeWorkbooks.Views
         #region Редактирование фамилии сотрудника
         public void RedactSecondNameInRecord(int ID, string path, string secondName)
         {
+            //Проверка на пустоту базы данных
+            ChekingTheEmptinessOfTheDataBase(path);
+
             try
             {
+                //Загрузка сотрудников в список из базы
                 DataOfEmployees = ViewAllRecords(path);
-
+                //Поиск сотрудника по его ID
                 var employee = GetEmployeeByID(ID);
-
+                //Изменение фамилии
                 employee.SecondName = secondName;
-
+                //Запись в файл новых данных
                 WriteInformationToFile(path);
             }
             catch
@@ -207,14 +216,18 @@ namespace JournalOfEmployeeWorkbooks.Views
         #region Редактирование имени сотрудника
         public void RedactFirstNameInRecord(int ID, string path, string firstName)
         {
+            //Проверка на пустоту базы данных
+            ChekingTheEmptinessOfTheDataBase(path);
+
             try
             {
+                //Загрузка сотрудников в список из базы
                 DataOfEmployees = ViewAllRecords(path);
-
+                //Поиск сотрудника по его ID
                 var employee = GetEmployeeByID(ID);
-
+                //Изменение имени
                 employee.FirstName = firstName;
-
+                //Запись в файл новых данных
                 WriteInformationToFile(path);
             }
             catch
@@ -229,14 +242,18 @@ namespace JournalOfEmployeeWorkbooks.Views
         #region Редактирование отчества сотрудника
         public void RedactThirdNameInRecord(int ID, string path, string thirdName)
         {
+            //Проверка на пустоту базы данных
+            ChekingTheEmptinessOfTheDataBase(path);
+
             try
             {
+                //Загрузка сотрудников в список из базы
                 DataOfEmployees = ViewAllRecords(path);
-
+                //Поиск сотрудника по его ID
                 var employee = GetEmployeeByID(ID);
-
+                //Изменение отчества
                 employee.ThirdName = thirdName;
-
+                //Запись в файл новых данных
                 WriteInformationToFile(path);
             }
             catch
@@ -251,14 +268,18 @@ namespace JournalOfEmployeeWorkbooks.Views
         #region Редактирование даты рождения сотрудника
         public void RedactDateOfBirthInRecord(int ID, string path, string dateOfBirth)
         {
+            //Проверка на пустоту базы данных
+            ChekingTheEmptinessOfTheDataBase(path);
+
             try
             {
+                //Загрузка сотрудников в список из базы
                 DataOfEmployees = ViewAllRecords(path);
-
+                //Поиск сотрудника по его ID
                 var employee = GetEmployeeByID(ID);
-
+                //Изменение даты рождения сотрудника
                 employee.DateOfBirth = dateOfBirth;
-
+                //Запись в файл новых данных
                 WriteInformationToFile(path);
             }
             catch
@@ -273,14 +294,18 @@ namespace JournalOfEmployeeWorkbooks.Views
         #region Редактирование места рождения сотрудника
         public void RedactPlaceOfBirthInRecord(int ID, string path, string placeOfBirth)
         {
+            //Проверка на пустоту базы данных
+            ChekingTheEmptinessOfTheDataBase(path);
+
             try
             {
+                //Загрузка сотрудников в список из базы
                 DataOfEmployees = ViewAllRecords(path);
-
+                //Поиск сотрудника по его ID
                 var employee = GetEmployeeByID(ID);
-
+                //Изменение фамилии
                 employee.PlaceOfBirth = placeOfBirth;
-
+                //Запись в файл новых данных
                 WriteInformationToFile(path);
             }
             catch
@@ -291,6 +316,33 @@ namespace JournalOfEmployeeWorkbooks.Views
 
         }
         #endregion
+
+        /// <summary>
+        /// Проверка на пустоту базы данных
+        /// </summary>
+        /// <param name="path">Путь к файлу базы данных</param>
+        /// <exception cref="ApplicationException">Возникает в случае,
+        /// когда база данных оказывается пустая</exception>
+        private void ChekingTheEmptinessOfTheDataBase(string path)
+        {
+            try
+            {
+                //Добавление всех сотрудников из файла в список
+                DataOfEmployees = ViewAllRecords(path);
+
+                //Проверка на пустоту базы данных
+                if (DataOfEmployees.Count == 0)
+                {
+                    throw new Exception();
+                }
+            }
+            catch
+            {
+                //Присвоение сообщения об ошибке выбрасываемому исключению
+                ErrorMessage = "The employee database is empty!";
+                throw new ApplicationException(ErrorMessage);
+            }
+        }
 
         /// <summary>
         /// Получение сотрудника по его ID
@@ -313,6 +365,9 @@ namespace JournalOfEmployeeWorkbooks.Views
         public List<Employee> LoadingRecordsInSelectedDateRange(string path,
             DateTime startingDate, DateTime endDate)
         {
+            //Проверка на пустоту базы данных
+            ChekingTheEmptinessOfTheDataBase(path);
+
             try
             {
                 //Добавление всех сотрудников из файла в список

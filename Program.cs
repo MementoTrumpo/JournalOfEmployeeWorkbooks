@@ -7,6 +7,9 @@ using System.Runtime.CompilerServices;
 using System.Xml.Linq;
 using System.Reflection.Metadata;
 using System.Threading;
+using System.Net.NetworkInformation;
+using System.Linq;
+using System.Runtime.Serialization;
 
 namespace JournalOfEmployeeWorkbooks
 {
@@ -88,7 +91,22 @@ namespace JournalOfEmployeeWorkbooks
 
             Console.ReadKey();
         }
- 
+    
+        /// <summary>
+        /// Выводит информацию о сотрудниках в консоль
+        /// </summary>
+        /// <param name="listOfEmployees">Список сотрудников в базе данных</param>
+        private static void PrintingEmployeesToConsole(List<Employee> listOfEmployees)
+        {
+            var separatingLine = "\t---------------------------------------------";
+
+            foreach(var employee in listOfEmployees)
+            {
+                Console.WriteLine(separatingLine + "\n");
+                Console.WriteLine(employee.ToString());
+            }
+        }
+
         /// <summary>
         /// Операции выбора в пользовательском меню
         /// </summary>
@@ -250,20 +268,48 @@ namespace JournalOfEmployeeWorkbooks
                             //Сообщение пользователю о корректности ввода
                             PrintingSuggestionsAboutCorrectnessOfInput();
 
+                            //Ввод символа, который пользователь вводит при корректности ввода
                             ConsoleKey keyToTruth;
 
-                            keyToTruth = Console.ReadKey(true).Key;
-                            
-                            if ((keyToTruth == ConsoleKey.D1) || (keyToTruth == ConsoleKey.NumPad1))
+                            do
                             {
-                                //Создание записи в базе данных
-                                repository.CreateRecord(path: PATH, employee);
-                                dataIsCorrectly = true;
-                            }
-                            else if ((keyToTruth == ConsoleKey.D2) || (keyToTruth == ConsoleKey.NumPad2))
-                            {
-                                continue;
-                            }
+                                keyToTruth = Console.ReadKey(true).Key;
+
+                                if (keyToTruth == ConsoleKey.D1 || keyToTruth == ConsoleKey.NumPad1)
+                                {
+                                    //Если функция завершилась корректно, то выходим из 2х циклов
+                                    repository.CreateRecord(PATH, employee);
+                                    dataIsCorrectly = true;
+                                    break;
+
+                                }
+                                //Повторный ввод ID сотрудника
+                                else if (keyToTruth == ConsoleKey.D2 ||
+                                         keyToTruth == ConsoleKey.NumPad2)
+                                {
+                                    if (ContinueInput() == true)
+                                    {
+                                        //Повтор ввода ID
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        //Выход в главное меню
+                                        dataIsCorrectly = true;
+                                        break;
+                                    }
+                                }
+                                //Нажата не та клавиша, продолжаем считывание
+                                else
+                                {
+                                    continue;
+                                }
+
+                            } while (keyToTruth != ConsoleKey.D1 ||
+                                     keyToTruth != ConsoleKey.NumPad1 ||
+                                     keyToTruth != ConsoleKey.D2 ||
+                                     keyToTruth != ConsoleKey.NumPad2);
+
                         } while (dataIsCorrectly != true);
 
                         //Возврат в главное меню
@@ -271,9 +317,11 @@ namespace JournalOfEmployeeWorkbooks
                                                 
                         break;
 
+                    ///Удаление сотрудника из базы данных
                     case (ConsoleKey.D2 or ConsoleKey.NumPad2):
 
                         dataIsCorrectly = false;
+
                         do
                         {
                             //Очистка консоли и информирование пользователя о совершаемом им действии
@@ -291,36 +339,69 @@ namespace JournalOfEmployeeWorkbooks
 
                             //Сообщение пользователю о корректности ввода
                             PrintingSuggestionsAboutCorrectnessOfInput();
-                            
-                            ConsoleKey keyToTruth = Console.ReadKey(true).Key;
+                            Console.WriteLine();
 
-                            if(keyToTruth == ConsoleKey.D1 || keyToTruth == ConsoleKey.NumPad1)
+                            //Ввод символа, который пользователь вводит при корректности ввода
+                            ConsoleKey keyToTruth;
+
+                            do
                             {
-                                //Удаление сотрудника из базы данных
-                                var output = mainView.DeleteEmployee(repository,int.Parse(mainView.ID),
-                                    phraseDeletingOfEmployee, PATH);
-                                if(output == 1)
+                                keyToTruth = Console.ReadKey(true).Key;
+
+                                if (keyToTruth == ConsoleKey.D1 || keyToTruth == ConsoleKey.NumPad1)
                                 {
-                                    dataIsCorrectly = true;
+                                    //Вызов самой функции для редактирования имени
+                                    int output = mainView.DeleteEmployee(repository,
+                                        int.Parse(mainView.ID), phraseDeletingOfEmployee, PATH);
+
+                                    //Если функция завершилась корректно, то выходим из 2х циклов
+                                    if (output == 1)
+                                    {
+                                        dataIsCorrectly = true;
+                                        break;
+                                    }
+
+                                    //Иначе вызываем функцию выхода в главное меню
+                                    else
+                                    {
+                                        if (ContinueInput() == true)
+                                        {
+                                            //Повтор ввода ID
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            //Выход в главное меню
+                                            dataIsCorrectly = true;
+                                            break;
+
+                                        }
+                                    }
                                 }
+                                //Повторный ввод ID сотрудника
+                                else if (keyToTruth == ConsoleKey.D2 ||
+                                         keyToTruth == ConsoleKey.NumPad2)
+                                {
+                                    break;
+                                }
+                                //Нажата не та клавиша, продолжаем считывание
                                 else
                                 {
                                     continue;
                                 }
-                                
-                            }
 
-                            else if(keyToTruth == ConsoleKey.D2 || keyToTruth == ConsoleKey.NumPad2)
-                            {
-                                continue;
-                            }
+                            } while (keyToTruth != ConsoleKey.D1 ||
+                                     keyToTruth != ConsoleKey.NumPad1 ||
+                                     keyToTruth != ConsoleKey.D2 ||
+                                     keyToTruth != ConsoleKey.NumPad2);
+
                         } while (dataIsCorrectly != true);
                         
                         //Возврат в главное меню
                         ReturnToMainMenu();
                         break;
 
-
+                    ///Просмотр всех записей сотрудников из базы данных
                     case (ConsoleKey.D3 or ConsoleKey.NumPad3):
                         //Очистка консоли и информирование пользователя о совершаемом им действии
                         Console.Clear();
@@ -330,13 +411,65 @@ namespace JournalOfEmployeeWorkbooks
 
                         repository = new Repository(ListOfEmployee);
                         List<Employee> listOfEmployees = repository.ViewAllRecords(PATH);
+                        string separateLine;
 
-                        string separateLine = "\t---------------------------------------------";
-                        foreach (var employee in listOfEmployees)
+                        if(listOfEmployees.Count == 0)
                         {
-                            Console.WriteLine(separateLine + "\n");
-                            Console.WriteLine(employee.ToString());
+                            Console.WriteLine("\tUnfortunately, the list of employees is empty\n");
+                            ReturnToMainMenu();
+                            break;
                         }
+
+                        var sortingText = "\tSort the list of employees by:\n";
+                        Console.WriteLine(GetSeparatingLine(sortingText) + "\n");
+                        Console.WriteLine(sortingText);
+                        Console.WriteLine(GetSeparatingLine(sortingText) + "\n");
+                        Console.WriteLine("\t1 - Surname\n");
+                        Console.WriteLine("\t2 - Name\n");
+                        Console.WriteLine("\t3 - Patronymic\n");
+                        Console.WriteLine("\t4 - ID\n");
+                        Console.WriteLine(GetSeparatingLine(sortingText) + "\n");
+
+                        ConsoleKey selectionKey;
+                        do
+                        {
+                            selectionKey = Console.ReadKey(true).Key;
+
+                            if (selectionKey == ConsoleKey.D1 || selectionKey == ConsoleKey.NumPad1)
+                            {
+                                var listOrderedBySurname = listOfEmployees.OrderBy(x => x.SecondName);
+                                PrintingEmployeesToConsole(listOrderedBySurname.ToList());
+                                break;
+                            }
+
+                            else if(selectionKey == ConsoleKey.D2 || selectionKey == ConsoleKey.NumPad2)
+                            {
+                                var listOrderedBySurname = listOfEmployees.OrderBy(x => x.FirstName);
+                                PrintingEmployeesToConsole(listOrderedBySurname.ToList());
+                                break;
+                            }
+
+                            else if (selectionKey == ConsoleKey.D3 || selectionKey == ConsoleKey.NumPad3)
+                            {
+                                var listOrderedBySurname = listOfEmployees.OrderBy(x => x.ThirdName);
+                                PrintingEmployeesToConsole(listOrderedBySurname.ToList());
+                                break;
+                            }
+                            else if (selectionKey == ConsoleKey.D4 || selectionKey == ConsoleKey.NumPad4)
+                            {
+                                var listOrderedBySurname = listOfEmployees.OrderBy(x => x.ID);
+                                PrintingEmployeesToConsole(listOrderedBySurname.ToList());
+                                break;
+                            }
+                            else
+                            {
+                                continue;
+                            }
+
+                        } while (selectionKey != ConsoleKey.D1 || selectionKey != ConsoleKey.NumPad1 ||
+                                 selectionKey != ConsoleKey.D2 || selectionKey != ConsoleKey.NumPad2 ||
+                                 selectionKey != ConsoleKey.D3 || selectionKey != ConsoleKey.NumPad3 ||
+                                 selectionKey != ConsoleKey.D4 || selectionKey != ConsoleKey.NumPad4 );
 
                         //Возврат в главное меню
                         ReturnToMainMenu();
@@ -362,46 +495,84 @@ namespace JournalOfEmployeeWorkbooks
 
                             //Опрос пользователя о корректности ввода
                             PrintingSuggestionsAboutCorrectnessOfInput();
+                            Console.WriteLine();
 
                             separateLine = "\t---------------------------------------------";
 
-
-                            ConsoleKey keyToTruth = Console.ReadKey(true).Key;
-                            if((keyToTruth == ConsoleKey.D1) || (keyToTruth == ConsoleKey.NumPad1))
+                            ConsoleKey keyToTruth;
+                            //Проверка корректности ввода и вызов главной функции
+                            do
                             {
-                                var output = mainView.ViewingOneRecordByID(repository,
-                                    int.Parse(mainView.ID), PATH, out Employee employee);
-                                if(output == 1)
+                                //Считываем клавишу для выбора корректности ввода данных
+                                keyToTruth = Console.ReadKey(true).Key;
+                                //Если нажимаем 1 - то идет вызов главной функции
+                                //Если нажимаем 2 - то идет возврат к началу ввода ID
+                                if (keyToTruth == ConsoleKey.D1 || keyToTruth == ConsoleKey.NumPad1)
                                 {
-                                    Console.WriteLine(separateLine);
-                                    Console.Write(employee.ToString());
-                                    Console.WriteLine(separateLine + "\n");
-                                    dataIsCorrectly = true;
+                                    int output = mainView.ViewingOneRecordByID(repository,
+                                                 int.Parse(mainView.ID), PATH, out Employee employee);
+
+                                    //Если функция завершилась корректно, то выходим из 2х циклов
+                                    if (output == 1)
+                                    {
+                                        Console.WriteLine(separateLine + "\n");
+                                        Console.Write(employee.ToString());
+                                        Console.WriteLine(separateLine);
+                                        dataIsCorrectly = true;
+                                        break;
+                                    }
+
+                                    //Иначе вызываем функцию выхода в главное меню
+                                    else
+                                    {
+                                        if (ContinueInput() == true)
+                                        {
+                                            //Повтор ввода ID
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            //Выход в главное меню
+                                            dataIsCorrectly = true;
+                                            break;
+
+                                        }
+                                    }
                                 }
+                                //Повторный ввод ID сотрудника
+                                else if (keyToTruth == ConsoleKey.D2 ||
+                                         keyToTruth == ConsoleKey.NumPad2)
+                                {
+                                    break;
+                                }
+                                //Нажата не та клавиша
                                 else
                                 {
                                     continue;
                                 }
-                            }
-                            else
-                            {
-                                continue;
-                            }
-                            //Возврат в главное меню
-                            ReturnToMainMenu();
+
+                            } while (keyToTruth != ConsoleKey.D1 ||
+                                     keyToTruth != ConsoleKey.NumPad1 ||
+                                     keyToTruth != ConsoleKey.D2 ||
+                                     keyToTruth != ConsoleKey.NumPad2);
 
                         } while (dataIsCorrectly != true);
+
+                        //Возврат в главное меню
+                        ReturnToMainMenu();
                         break;
+
                     ///Загрузка записей в выбранном диапазоне
                     case (ConsoleKey.D5 or ConsoleKey.NumPad5):
 
                         dataIsCorrectly = false;
                         var phraseLoadingRecordsInDateRange = "\tLoading records" +
                             " in the selected range";
+
                         repository = new Repository(ListOfEmployee);
                         mainView = new MainView();
 
-                        List<Employee> loadingRecords;
+                        List<Employee> loadingRecords = new List<Employee>();
 
                         do
                         {
@@ -414,41 +585,65 @@ namespace JournalOfEmployeeWorkbooks
                             Console.WriteLine();
                             //Ввод конечной даты, с которой производится поиск записей
                             mainView.InputEndDate(endDateSuggestion);
-                            //Загрузка всех записей, удовлетворяющих начальной и конечной дате
-                            loadingRecords = repository.LoadingRecordsInSelectedDateRange(PATH,
-                                DateTime.Parse(mainView.StartDate), DateTime.Parse(mainView.EndDate));
                             Console.WriteLine();
-                            //Если список оказывается пуст, то выводится сообщение об ошибке
-                            if(loadingRecords.Count == 0)
+                            PrintingSuggestionsAboutCorrectnessOfInput();
+                            Console.WriteLine();
+                            ConsoleKey keyToTruth;
+                            do
                             {
-                                Console.WriteLine("\tUnfortunately," +
-                                    " there is not a single record in this range");
-                                ConsoleKey keyToContinue;
+                                keyToTruth = Console.ReadKey(true).Key;
 
-                                do
+                                if(keyToTruth == ConsoleKey.D1 || keyToTruth == ConsoleKey.NumPad1)
                                 {
-                                    //Текущая позиция курсора в консоли
-                                    currentPosition = Console.GetCursorPosition();
-                                    Console.WriteLine("\tPlease, repeat the input");
-                                    //Ввод значения для продолжения ввода
-                                    keyToContinue = Console.ReadKey(false).Key;
-                                    ClearIncorrectInput(currentPosition);
+                                    int output = mainView.LoadingRecordsInSelectedDateRange(
+                                        repository, PATH, DateTime.Parse(mainView.StartDate),
+                                        DateTime.Parse(mainView.EndDate), out loadingRecords);
 
-                                } while (keyToContinue != ConsoleKey.Enter);
-                                
-                                continue;
-                            }
-                            else
-                            {
-                                dataIsCorrectly = true;
-                            }
+                                    //Если функция завершилась корректно, то выходим из 2х циклов
+                                    if (output == 1)
+                                    {
+                                        PrintingEmployeesToConsole(loadingRecords);
+                                        dataIsCorrectly = true;
+                                        break;
+                                    }
+
+                                    //Иначе вызываем функцию выхода в главное меню
+                                    else
+                                    {
+                                        if (ContinueInput() == true)
+                                        {
+                                            //Повтор ввода ID
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            //Выход в главное меню
+                                            dataIsCorrectly = true;
+                                            break;
+
+                                        }
+                                    }
+                                }
+                                //Повторный ввод ID сотрудника
+                                else if (keyToTruth == ConsoleKey.D2 ||
+                                         keyToTruth == ConsoleKey.NumPad2)
+                                {
+                                    break;
+                                }
+                                //Нажата не та клавиша, продолжаем считывание
+                                else
+                                {
+                                    continue;
+                                }
+
+                            } while (keyToTruth != ConsoleKey.D1 ||
+                                     keyToTruth != ConsoleKey.NumPad1 ||
+                                     keyToTruth != ConsoleKey.D2 ||
+                                     keyToTruth != ConsoleKey.NumPad2);
+
+
                         } while (dataIsCorrectly != true);
-                        //Вывод в консоль всех удовлетворяющих записей
-                        foreach (var record in loadingRecords)
-                        {
-                            Console.WriteLine("\t---------------------------------------------\n");
-                            Console.WriteLine(record.ToString());
-                        }
+ 
                         //Возврат в главное меню
                         ReturnToMainMenu();
                         break;
@@ -474,28 +669,61 @@ namespace JournalOfEmployeeWorkbooks
                             Console.WriteLine();
                             //Печать предложений о правильности ввода ID сотрудника
                             PrintingSuggestionsAboutCorrectnessOfInput();
-                            //Ввод символа, который пользователь вводит при корректности ввода ID
-                            ConsoleKey keyToTruth = Console.ReadKey(true).Key;
                             Console.WriteLine();
 
-                            if(keyToTruth == ConsoleKey.D1 || keyToTruth == ConsoleKey.NumPad1)
+                            //Ввод символа, который пользователь вводит при корректности ввода ID
+                            ConsoleKey keyToTruth;
+
+                            do
                             {
-                                //Попытка изменить имя сотрудника (1 - если все успешно, 0 - если неудача)
-                                int output = mainView.RedactFirstNameOfEmployee(repository,
-                                    int.Parse(mainView.ID), PATH, firstNameSugestion);
-                                if(output == 1)
+                                keyToTruth = Console.ReadKey(true).Key;
+
+                                if (keyToTruth == ConsoleKey.D1 || keyToTruth == ConsoleKey.NumPad1)
                                 {
-                                    dataIsCorrectly = true;
+                                    //Вызов самой функции для редактирования имени
+                                    int output = mainView.RedactFirstNameOfEmployee(repository,
+                                        int.Parse(mainView.ID), PATH, firstNameSugestion);
+
+                                    //Если функция завершилась корректно, то выходим из 2х циклов
+                                    if (output == 1)
+                                    {
+                                        dataIsCorrectly = true;
+                                        break;
+                                    }
+
+                                    //Иначе вызываем функцию выхода в главное меню
+                                    else
+                                    {
+                                        if (ContinueInput() == true)
+                                        {
+                                            //Повтор ввода ID
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            //Выход в главное меню
+                                            dataIsCorrectly = true;
+                                            break;
+
+                                        }
+                                    }
                                 }
+                                //Повторный ввод ID сотрудника
+                                else if (keyToTruth == ConsoleKey.D2 ||
+                                         keyToTruth == ConsoleKey.NumPad2)
+                                {
+                                    break;
+                                }
+                                //Нажата не та клавиша, продолжаем считывание
                                 else
                                 {
                                     continue;
                                 }
-                            }
-                            else
-                            {
-                                continue;
-                            }
+
+                            } while (keyToTruth != ConsoleKey.D1 ||
+                                     keyToTruth != ConsoleKey.NumPad1 ||
+                                     keyToTruth != ConsoleKey.D2 ||
+                                     keyToTruth != ConsoleKey.NumPad2);
 
                         } while (dataIsCorrectly != true);
                         //Возврат в главное меню
@@ -523,30 +751,64 @@ namespace JournalOfEmployeeWorkbooks
                             Console.WriteLine();
                             //Печать предложений о правильности ввода ID сотрудника
                             PrintingSuggestionsAboutCorrectnessOfInput();
-                            //Ввод символа, который пользователь вводит при корректности ввода ID
-                            ConsoleKey keyToTruth = Console.ReadKey(true).Key;
                             Console.WriteLine();
 
-                            if (keyToTruth == ConsoleKey.D1 || keyToTruth == ConsoleKey.NumPad1)
+                            //Ввод символа, который пользователь вводит при корректности ввода ID
+                            ConsoleKey keyToTruth;
+
+                            do
                             {
-                                //Попытка изменить имя сотрудника (1 - если все успешно, 0 - если неудача)
-                                int output = mainView.RedactSecondNameOfEmployee(repository,
-                                    int.Parse(mainView.ID), PATH, dateOfBirthSuggestion);
-                                if (output == 1)
+                                keyToTruth = Console.ReadKey(true).Key;
+
+                                if (keyToTruth == ConsoleKey.D1 || keyToTruth == ConsoleKey.NumPad1)
                                 {
-                                    dataIsCorrectly = true;
+                                    //Вызов самой функции для редактирования фамилии
+                                    int output = mainView.RedactSecondNameOfEmployee(repository,
+                                        int.Parse(mainView.ID), PATH, secondNameSuggestion);
+
+                                    //Если функция завершилась корректно, то выходим из 2х циклов
+                                    if (output == 1)
+                                    {
+                                        dataIsCorrectly = true;
+                                        break;
+                                    }
+
+                                    //Иначе вызываем функцию выхода в главное меню
+                                    else
+                                    {
+                                        if (ContinueInput() == true)
+                                        {
+                                            //Повтор ввода ID
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            //Выход в главное меню
+                                            dataIsCorrectly = true;
+                                            break;
+
+                                        }
+                                    }
                                 }
+                                //Повторный ввод ID сотрудника
+                                else if (keyToTruth == ConsoleKey.D2 ||
+                                         keyToTruth == ConsoleKey.NumPad2)
+                                {
+                                    break;
+                                }
+                                //Нажата не та клавиша, продолжаем считывание
                                 else
                                 {
                                     continue;
                                 }
-                            }
-                            else
-                            {
-                                continue;
-                            }
+
+                            } while (keyToTruth != ConsoleKey.D1 ||
+                                     keyToTruth != ConsoleKey.NumPad1 ||
+                                     keyToTruth != ConsoleKey.D2 ||
+                                     keyToTruth != ConsoleKey.NumPad2);
 
                         } while (dataIsCorrectly != true);
+
                         //Возврат в главное меню
                         ReturnToMainMenu();
                         break;
@@ -572,30 +834,64 @@ namespace JournalOfEmployeeWorkbooks
                             Console.WriteLine();
                             //Печать предложений о правильности ввода ID сотрудника
                             PrintingSuggestionsAboutCorrectnessOfInput();
-                            //Ввод символа, который пользователь вводит при корректности ввода ID
-                            ConsoleKey keyToTruth = Console.ReadKey(true).Key;
                             Console.WriteLine();
 
-                            if (keyToTruth == ConsoleKey.D1 || keyToTruth == ConsoleKey.NumPad1)
+                            //Ввод символа, который пользователь вводит при корректности ввода ID
+                            ConsoleKey keyToTruth;
+
+                            do
                             {
-                                //Попытка изменить имя сотрудника (1 - если все успешно, 0 - если неудача)
-                                int output = mainView.RedactThirdNameOfEmployee(repository,
-                                    int.Parse(mainView.ID), PATH, dateOfBirthSuggestion);
-                                if (output == 1)
+                                keyToTruth = Console.ReadKey(true).Key;
+
+                                if (keyToTruth == ConsoleKey.D1 || keyToTruth == ConsoleKey.NumPad1)
                                 {
-                                    dataIsCorrectly = true;
+                                    //Вызов самой функции для редактирования отчества
+                                    int output = mainView.RedactThirdNameOfEmployee(repository,
+                                        int.Parse(mainView.ID), PATH, thirdNameSuggestion);
+
+                                    //Если функция завершилась корректно, то выходим из 2х циклов
+                                    if (output == 1)
+                                    {
+                                        dataIsCorrectly = true;
+                                        break;
+                                    }
+
+                                    //Иначе вызываем функцию выхода в главное меню
+                                    else
+                                    {
+                                        if (ContinueInput() == true)
+                                        {
+                                            //Повтор ввода ID
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            //Выход в главное меню
+                                            dataIsCorrectly = true;
+                                            break;
+
+                                        }
+                                    }
                                 }
+                                //Повторный ввод ID сотрудника
+                                else if (keyToTruth == ConsoleKey.D2 ||
+                                         keyToTruth == ConsoleKey.NumPad2)
+                                {
+                                    break;
+                                }
+                                //Нажата не та клавиша, продолжаем считывание
                                 else
                                 {
                                     continue;
                                 }
-                            }
-                            else
-                            {
-                                continue;
-                            }
+
+                            } while (keyToTruth != ConsoleKey.D1 ||
+                                     keyToTruth != ConsoleKey.NumPad1 ||
+                                     keyToTruth != ConsoleKey.D2 ||
+                                     keyToTruth != ConsoleKey.NumPad2);
 
                         } while (dataIsCorrectly != true);
+
                         //Возврат в главное меню
                         ReturnToMainMenu();
                         break;
@@ -621,30 +917,64 @@ namespace JournalOfEmployeeWorkbooks
                             Console.WriteLine();
                             //Печать предложений о правильности ввода ID сотрудника
                             PrintingSuggestionsAboutCorrectnessOfInput();
-                            //Ввод символа, который пользователь вводит при корректности ввода ID
-                            ConsoleKey keyToTruth = Console.ReadKey(true).Key;
                             Console.WriteLine();
 
-                            if (keyToTruth == ConsoleKey.D1 || keyToTruth == ConsoleKey.NumPad1)
+                            //Ввод символа, который пользователь вводит при корректности ввода ID
+                            ConsoleKey keyToTruth;
+
+                            do
                             {
-                                //Попытка изменить имя сотрудника (1 - если все успешно, 0 - если неудача)
-                                int output = mainView.RedactDateOfBirthOfEmployee(repository,
-                                    int.Parse(mainView.ID), PATH, dateOfBirthSuggestion);
-                                if (output == 1)
+                                keyToTruth = Console.ReadKey(true).Key;
+
+                                if (keyToTruth == ConsoleKey.D1 || keyToTruth == ConsoleKey.NumPad1)
                                 {
-                                    dataIsCorrectly = true;
+                                    //Вызов самой функции для редактирования даты рождения сотрудника
+                                    int output = mainView.RedactDateOfBirthOfEmployee(repository,
+                                        int.Parse(mainView.ID), PATH, dateOfBirthSuggestion);
+
+                                    //Если функция завершилась корректно, то выходим из 2х циклов
+                                    if (output == 1)
+                                    {
+                                        dataIsCorrectly = true;
+                                        break;
+                                    }
+
+                                    //Иначе вызываем функцию выхода в главное меню
+                                    else
+                                    {
+                                        if (ContinueInput() == true)
+                                        {
+                                            //Повтор ввода ID
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            //Выход в главное меню
+                                            dataIsCorrectly = true;
+                                            break;
+
+                                        }
+                                    }
                                 }
+                                //Повторный ввод ID сотрудника
+                                else if (keyToTruth == ConsoleKey.D2 ||
+                                         keyToTruth == ConsoleKey.NumPad2)
+                                {
+                                    break;
+                                }
+                                //Нажата не та клавиша, продолжаем считывание
                                 else
                                 {
                                     continue;
                                 }
-                            }
-                            else
-                            {
-                                continue;
-                            }
+
+                            } while (keyToTruth != ConsoleKey.D1 ||
+                                     keyToTruth != ConsoleKey.NumPad1 ||
+                                     keyToTruth != ConsoleKey.D2 ||
+                                     keyToTruth != ConsoleKey.NumPad2);
 
                         } while (dataIsCorrectly != true);
+
                         //Возврат в главное меню
                         ReturnToMainMenu();
                         break;
@@ -671,29 +1001,64 @@ namespace JournalOfEmployeeWorkbooks
                             //Печать предложений о правильности ввода ID сотрудника
                             PrintingSuggestionsAboutCorrectnessOfInput();
                             //Ввод символа, который пользователь вводит при корректности ввода ID
-                            ConsoleKey keyToTruth = Console.ReadKey(true).Key;
+                            ConsoleKey keyToTruth;
                             Console.WriteLine();
-
-                            if (keyToTruth == ConsoleKey.D1 || keyToTruth == ConsoleKey.NumPad1)
+                            
+                            //Проверка корректности ввода и вызов главной функции
+                            do
                             {
-                                //Попытка изменить имя сотрудника (1 - если все успешно, 0 - если неудача)
-                                int output = mainView.RedactPlaceOfBirthOfEmployee(repository,
-                                    int.Parse(mainView.ID), PATH, dateOfBirthSuggestion);
-                                if (output == 1)
+                                //Считываем клавишу для выбора корректности ввода данных
+                                keyToTruth = Console.ReadKey(true).Key;
+                                //Если нажимаем 1 - то идет вызов главной функции
+                                //Если нажимаем 2 - то идет возврат к началу ввода ID
+                                if(keyToTruth == ConsoleKey.D1 || keyToTruth == ConsoleKey.NumPad1)
                                 {
-                                    dataIsCorrectly = true;
+                                    int output = mainView.RedactPlaceOfBirthOfEmployee(repository,
+                                    int.Parse(mainView.ID), PATH, placeOfBirthSuggestion);
+                                    
+                                    //Если функция завершилась корректно, то выходим из 2х циклов
+                                    if (output == 1)
+                                    {
+                                        dataIsCorrectly = true;
+                                        break;
+                                    }
+
+                                    //Иначе вызываем функцию выхода в главное меню
+                                    else
+                                    {
+                                        if (ContinueInput() == true)
+                                        {
+                                            //Повтор ввода ID
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            //Выход в главное меню
+                                            dataIsCorrectly = true;
+                                            break;
+
+                                        }
+                                    }
                                 }
+                                //Повторный ввод ID сотрудника
+                                else if (keyToTruth == ConsoleKey.D2 || 
+                                         keyToTruth == ConsoleKey.NumPad2)
+                                {
+                                    break;
+                                }
+                                //Нажата не та клавиша
                                 else
                                 {
                                     continue;
                                 }
-                            }
-                            else
-                            {
-                                continue;
-                            }
+                                
+                            } while (keyToTruth != ConsoleKey.D1 || 
+                                     keyToTruth != ConsoleKey.NumPad1 ||
+                                     keyToTruth != ConsoleKey.D2 ||
+                                     keyToTruth != ConsoleKey.NumPad2);
 
                         } while (dataIsCorrectly != true);
+
                         //Возврат в главное меню
                         ReturnToMainMenu();
                         break;
@@ -702,16 +1067,72 @@ namespace JournalOfEmployeeWorkbooks
 
         }
 
+        private static void OffersToGoToMainMenu()
+        {
+
+
+        }
+
+        /// <summary>
+        /// Предлагает пользователю продолжить ввод заново либо выйти в главное меню
+        /// </summary>
+        /// <returns>true - если ввод продолжится, false - выход в главное меню</returns>
+        private static bool ContinueInput()
+        {
+            //Текст, выводимый пользователю
+            var textOfContinueInput = "Do you want to continue typing or exit to the main menu?";
+
+            //Вывод в консоль информации о возможности дальнейших событий
+            Console.WriteLine($"{GetSeparatingLine(textOfContinueInput)}");
+            Console.WriteLine($"\t{textOfContinueInput}");
+            Console.WriteLine($"{GetSeparatingLine(textOfContinueInput)}\n");
+            Console.WriteLine("\tEnter 1 - if you want to continue typing\n");
+            Console.WriteLine("\tEnter 2 - if you want to go to the main menu\n");
+            Console.WriteLine($"{GetSeparatingLine(textOfContinueInput)}\n");
+
+            bool output = false;
+
+            ConsoleKey keyToContinue;
+
+            do
+            {
+                //Считываение клавиши
+                keyToContinue = Console.ReadKey(true).Key;
+
+                //Если нажата 1 - ввод данных продолжится
+                if (keyToContinue == ConsoleKey.D1 || keyToContinue == ConsoleKey.NumPad1)
+                {
+                    output = true;
+                    break;
+                }
+
+                //Если нажата 2 - ввод данных прекращается
+                else if (keyToContinue == ConsoleKey.D2 || keyToContinue == ConsoleKey.NumPad2)
+                {
+                    output = false;
+                    break;
+                }
+
+                //Если пользоваетль нажимает что-то другое, то продолжается считываение клавиш
+                else
+                {
+                    continue;
+                }
+            } while ((keyToContinue != ConsoleKey.D1 || keyToContinue != ConsoleKey.NumPad2) ||
+                     (keyToContinue != ConsoleKey.D2 || keyToContinue != ConsoleKey.NumPad2));
+
+            //Возврат результата пользователя
+            return output;
+        }
+
         /// <summary>
         /// Предложения ввода корректности ввода
         /// </summary>
         private List<string> SuggestionsForCorrectInput = new List<string>()
         {
-            "\t---------------------------------------------\n",
-            "\tCheck the correctness of the entered data\n",
-            "\tEnter 1 - if all the data is entered correctly\n",
-            "\tEnter 2 - if the data is entered incorrectly\n",
-            "\t---------------------------------------------\n"
+            "Check the correctness of the entered data:",
+            "Enter 1 - if all the data is entered correctly",
+            "Enter 2 - if the data is entered incorrectly"
         };
 
         /// <summary>
@@ -719,12 +1140,24 @@ namespace JournalOfEmployeeWorkbooks
         /// </summary>
         public void PrintingSuggestionsAboutCorrectnessOfInput()
         {
-            foreach(var suggestion in SuggestionsForCorrectInput)
+            int maxCharacter = 0;
+            int maximum = SuggestionsForCorrectInput.Max(x => x.Length);
+
+            for (int i = 0; i < SuggestionsForCorrectInput.Count; i++)
             {
-                Console.Write(suggestion);
+                if (SuggestionsForCorrectInput[i].Length > maxCharacter)
+                    maxCharacter = SuggestionsForCorrectInput[i].Length;
             }
+
+            Console.WriteLine($"{GetSeparatingLine(SuggestionsForCorrectInput[1])}");
+            Console.WriteLine($"\t{SuggestionsForCorrectInput[0]}");
+            Console.WriteLine($"{GetSeparatingLine(SuggestionsForCorrectInput[1])}\n");
+            Console.WriteLine($"\t{SuggestionsForCorrectInput[1]}\n");
+            Console.WriteLine($"\t{SuggestionsForCorrectInput[2]}\n");
+            Console.WriteLine($"{GetSeparatingLine(SuggestionsForCorrectInput[1])}\n");
+
         }
-        
+
         /// <summary>
         /// Возващает строку разделителей (нижнего подчеркивания) с учетом длины строки
         /// </summary>

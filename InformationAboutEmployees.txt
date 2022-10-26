@@ -1,7 +1,2 @@
-1883693298#10.09.2022#Филинков#Василий#Александрович#15.03.2003#19#Слободской#младший джун
-1005454454#13.09.2022#Иванов#Петр#Иванович#01.04.1999#23#Киров#сеньер
-1047847420#14.09.2022#Овчинников#Илья#Петрович#01.10.2003#19#Ростов-на-Дону#старший менеждер
-507763587#01.10.2022#Plyusnin#Saveliy#Gennadievich#16.08.2000#22#Moskva#middle CSharp developer
-520260230#02.10.2022#Ovchinnikov#Alelsey#Petrovich#02.10.2003#19#Rostov-na-Donu#Samiy glavniy HUI
-376821789#05.10.2022#Petrov#Aleksander#Vasylevych#05.05.1988#34#Moskva#piar menedjer
-656462039#19.10.2022#Егоров#Тимофей#Михайлович#28.07.2002#20#Москва, Россия#Software developer
+27085660#26.10.2022#Plyusnin#Saveliy#Gennadievich#15.03.2003#19#Slobodskoy#junior developer
+626995989#26.10.2022#Ivanov#Oleg#Alexeevich#17.01.2000#22#Moskow#project menejer

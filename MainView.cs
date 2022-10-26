@@ -8,6 +8,7 @@ using JournalOfEmployeeWorkbooks.Presenters;
 using System.Reflection;
 using System.IO;
 
+
 namespace JournalOfEmployeeWorkbooks
 {
     public class MainView
@@ -71,6 +72,12 @@ namespace JournalOfEmployeeWorkbooks
                 }
             }
         }
+
+        //public int CreateRecord(string path, Employee employee)
+        //{
+
+
+        //}
 
         #region Ввод имени сотрудника
         public void InputFirstName(Employee employee, string suggestion)
@@ -471,6 +478,51 @@ namespace JournalOfEmployeeWorkbooks
         }
         #endregion
 
+        public int LoadingRecordsInSelectedDateRange(Repository repository, string path,
+            DateTime startDate, DateTime endDate, out List<Employee> loadingRecords)
+        {
+            string errorMessage;
+
+            if(TryLoadingRecordsInSelectedDateRange(repository, path, startDate, 
+                endDate,out List<Employee> loadingRecordsInSecelectedDateRange) == true)
+            {
+                loadingRecords = loadingRecordsInSecelectedDateRange;
+                return 1;
+            }
+            else
+            {
+                loadingRecords = null;
+                return 0;
+            }
+        }
+
+
+        private bool TryLoadingRecordsInSelectedDateRange(Repository repository, string path,
+            DateTime startDate, DateTime endDate, out List<Employee> loadingRecordsInSecelectedDateRange)
+        {
+            var errorMessage = String.Empty;
+
+            //List<Employee> loadingRecordsInSecelectedDateRange;
+            try
+            {
+                loadingRecordsInSecelectedDateRange = 
+                    repository.LoadingRecordsInSelectedDateRange(path, startDate, endDate);
+                return true;
+
+            }
+            catch(Exception ex)
+            {
+                loadingRecordsInSecelectedDateRange = null;
+                errorMessage = ex.Message;
+                PrintErrorMessage(errorMessage);
+                Console.ReadLine();
+                return false;
+            }
+
+            
+        }
+
+
         #region Удаление сотрудника из базы данных
 
         /// <summary>
@@ -489,23 +541,18 @@ namespace JournalOfEmployeeWorkbooks
             {
                 correctOutput = 1;
             }
-            else
-            {
-                correctOutput = 0;
-            }
+            
             return correctOutput;
         }
 
 
-        private bool TryDeleteEmployee(Repository repository,int ID, string path, string suggestion,
-            out string errorMessage)
+        private bool TryDeleteEmployee(Repository repository,int ID, string path,
+            string deleteSuggestion, out string errorMessage)
         {
             errorMessage = string.Empty;
-
+            //Текущая позиция курсора
             currentPosition = Console.GetCursorPosition();
-
-            Program program = new Program();
-
+            
             try
             {
                 repository.DeleteRecord(ID, path);
@@ -873,8 +920,9 @@ namespace JournalOfEmployeeWorkbooks
         /// <param name="errorMessage"></param>
         private static void PrintErrorMessage(string errorMessage)
         {
-            Console.Write($"\n\t{errorMessage}");
-            Console.Write("\n\tPlease, repeat the input. Click enter to continue programm ....");
+            Console.Write($"\n\t{errorMessage}\n");
+            Console.Write("\n\tPlease, repeat the input or go to the main menu. " +
+                "Click enter to continue programm ....\n");
         }
 
         /// <summary>
